@@ -1,0 +1,172 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and balance information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "balance": { "type": "number", "description": "Current balance in BRL" },
+        "inviteCode": { "type": "string" },
+        "invitedBy": { "type": "string", "description": "UID of the user who invited this user" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "isBanned": { "type": "boolean" },
+        "isChatBanned": { "type": "boolean" },
+        "chatMuteUntil": { "type": "string", "format": "date-time", "description": "Timestamp until user is muted in chat" }
+      },
+      "required": ["uid", "name", "email", "balance", "inviteCode", "role"]
+    },
+    "Withdrawal": {
+      "title": "Withdrawal",
+      "description": "Withdrawal request",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "refused"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "status", "createdAt"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Financial transaction history",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["deposit", "withdraw", "win", "loss", "bonus"] },
+        "amount": { "type": "number" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "type", "amount", "createdAt"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global application settings",
+      "type": "object",
+      "properties": {
+        "registrationBonus": { "type": "number" },
+        "inviteBonus": { "type": "number" },
+        "minWithdrawal": { "type": "number" },
+        "minDeposit": { "type": "number" },
+        "carouselInterval": { "type": "number", "description": "Carousel interval in seconds" }
+      }
+    },
+    "Banner": {
+      "title": "Banner",
+      "description": "Home page banner",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "link": { "type": "string" },
+        "title": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["imageUrl", "isActive", "order"]
+    },
+    "Deposit": {
+      "title": "Deposit",
+      "description": "Deposit request and payment info",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "waiting_payment", "approved", "refused"] },
+        "pixKey": { "type": "string" },
+        "pixQrCode": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "status", "createdAt"]
+    },
+    "DoubleGameState": {
+      "title": "DoubleGameState",
+      "description": "Global state for the Double game",
+      "type": "object",
+      "properties": {
+        "status": { "type": "string", "enum": ["betting", "spinning", "result"] },
+        "timer": { "type": "number" },
+        "lastResult": { "type": "number" },
+        "history": { "type": "array", "items": { "type": "number" } },
+        "nextPhaseTime": { "type": "string", "format": "date-time" }
+      },
+      "required": ["status", "history"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Live chat message",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "text": { "type": "string" },
+        "role": { "type": "string" },
+        "color": { "type": "string", "description": "Message color for admins" },
+        "isPinned": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "userName", "text", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User notification",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Target user ID or 'all'" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message", "isRead", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/withdrawals/{withdrawalId}": {
+      "schema": "Withdrawal",
+      "description": "Withdrawal requests"
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Transaction history"
+    },
+    "/settings/global": {
+      "schema": "Settings",
+      "description": "Global config"
+    },
+    "/banners/{bannerId}": {
+      "schema": "Banner",
+      "description": "Home page banners"
+    },
+    "/deposits/{depositId}": {
+      "schema": "Deposit",
+      "description": "Deposit requests"
+    },
+    "/games/double": {
+      "schema": "DoubleGameState",
+      "description": "Global state for Double game"
+    },
+    "/chat/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Live chat messages"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications"
+    }
+  }
+}
